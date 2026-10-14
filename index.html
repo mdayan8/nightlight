@@ -207,8 +207,18 @@ textarea{width:100%;min-height:120px;border:0;border-radius:var(--r-md);backgrou
   <div class="set"><div class="set-text"><b>Appearance</b><small>Colour follows the agent that is working</small></div>
     <div class="seg3" role="group" aria-label="Appearance" id="theme-seg">
       <button data-theme="auto" aria-pressed="true">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div></div>
-  <div class="set"><div class="set-text"><b>Push alerts</b><small>Approvals and "finished" alerts, even when this page is closed</small></div>
-    <a class="btn btn-quiet" style="min-height:44px;text-decoration:none" id="sub-link" target="_blank" rel="noopener">Subscribe</a></div>
+  <div class="set" style="align-items:flex-start;flex-direction:column;gap:8px;padding:8px 0 4px">
+    <div class="set-text"><b>Push alerts</b><small>Get approvals and "finished" alerts as notifications, even when this page is closed. Needs the free ntfy app.</small></div>
+    <ol class="steps" style="gap:12px;margin-top:4px;font-size:14px">
+      <li class="step" style="font-size:14px"><span><a id="ntfy-store" href="#" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Install ntfy</a>, free, no account.</span></li>
+      <li class="step" style="font-size:14px"><span>In ntfy tap <b>+</b> and paste your channel:</span></li>
+    </ol>
+    <div style="display:flex;gap:8px;width:100%">
+      <code id="topic-code" style="flex:1;min-width:0;font:500 13px var(--mono);background:var(--surface-2);border-radius:var(--r-sm);padding:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
+      <button class="btn btn-quiet" style="min-height:44px" id="copy-topic">Copy</button>
+    </div>
+    <a class="btn btn-quiet" style="min-height:44px;text-decoration:none;width:100%" id="sub-link" target="_blank" rel="noopener">Open in ntfy</a>
+  </div>
   <div class="set" id="install-row" hidden><div class="set-text"><b>Add to Home Screen</b><small>Opens full-screen like an app</small></div>
     <button class="btn btn-quiet" style="min-height:44px" id="install-btn">Install</button></div>
   <p class="hint" id="install-hint" hidden>On iPhone: tap Share, then Add to Home Screen.</p>
@@ -470,7 +480,10 @@ function openSheet() {
   const st = S.status || {};
   $("sw-auto").setAttribute("aria-checked", !!st.auto);
   $("sw-lid").setAttribute("aria-checked", !!st.lidMode);
-  $("sub-link").href = `${NTFY}/${topic}`;
+  const ios = /iPhone|iPad/.test(navigator.userAgent);
+  $("ntfy-store").href = ios ? "https://apps.apple.com/app/ntfy/id1625396347" : "https://play.google.com/store/apps/details?id=io.heckel.ntfy";
+  $("topic-code").textContent = topic;
+  $("sub-link").href = ios ? `${NTFY}/${topic}` : `ntfy://ntfy.sh/${topic}`;
   document.querySelectorAll("#theme-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.theme === S.theme));
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   $("install-row").hidden = !S.installEvt || standalone;
@@ -480,6 +493,7 @@ function openSheet() {
 $("sw-auto").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", auto: v }, "set") };
 $("sw-lid").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", lidMode: v }, "set") };
 document.querySelectorAll("#theme-seg button").forEach(b => b.onclick = () => { S.theme = b.dataset.theme; store.set("nl.theme", S.theme === "auto" ? null : S.theme); openSheet(); render() });
+$("copy-topic").onclick = async () => { try { await navigator.clipboard.writeText(topic); toast("Channel copied. Paste it in ntfy.") } catch { toast("Long-press the code to copy it") } };
 $("install-btn").onclick = async () => { if (S.installEvt) { S.installEvt.prompt(); await S.installEvt.userChoice; S.installEvt = null; $("install-row").hidden = true } };
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); S.installEvt = e });
 for (const id of ["sheet", "compose"]) $(id).addEventListener("click", (e) => { if (e.target === $(id)) $(id).close() });

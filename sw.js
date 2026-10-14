@@ -1,5 +1,5 @@
 // Nightlight: cache the app shell so it opens instantly and offline. Live data always comes from the network.
-const CACHE = "nightlight-v1";
+const CACHE = "nightlight-v2";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./logo.svg"];
 
 self.addEventListener("install", (e) => {
