@@ -130,8 +130,6 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .row-text{flex:1;min-width:0}
 .row-title{display:block;font-size:16px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-meta{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reply{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--muted);flex:none}
-.reply:active{background:var(--surface-3)}
 .empty{padding:24px 16px;text-align:center;color:var(--muted);font-size:14px}
 .empty strong{display:block;color:var(--text);font-size:16px;font-weight:600;margin-bottom:4px}
 .hint{font-size:12px;color:var(--muted);margin-top:8px}
@@ -139,7 +137,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 /* dock: thumb zone, one primary action */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:12px 16px calc(env(safe-area-inset-bottom) + 12px);background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .dock-in{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);padding:4px;border-radius:var(--r-md)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);padding:4px;border-radius:var(--r-md)}
 .seg button{min-height:44px;border-radius:10px;font-size:14px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface-3);color:var(--text)}
 .dock-row{display:grid;grid-template-columns:1fr 2fr;gap:8px}
@@ -160,13 +158,7 @@ dialog[open]{animation:sheet .26s cubic-bezier(.2,.8,.2,1)}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
 .switch[aria-checked="true"]{background:var(--accent)}
 .switch[aria-checked="true"]::after{transform:translateX(20px)}
-.seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);padding:4px;border-radius:12px}
-.seg3 button{min-height:40px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted)}
-.seg3 button[aria-pressed="true"]{background:var(--surface);color:var(--text)}
 .link-btn{color:var(--bad);font-weight:500;min-height:44px;margin-top:8px}
-textarea{width:100%;min-height:120px;border:0;border-radius:var(--r-md);background:var(--surface-2);padding:12px 16px;resize:none;line-height:1.5}
-.quick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}
-.quick button{min-height:40px;padding:0 14px;border-radius:999px;background:var(--surface-2);font-size:14px;font-weight:500}
 
 /* pairing */
 .pair{display:flex;flex-direction:column;gap:24px;padding-top:24px}
@@ -202,21 +194,10 @@ textarea{width:100%;min-height:120px;border:0;border-radius:var(--r-md);backgrou
   <h2 class="sheet-title" id="sheet-title">Settings</h2>
   <div class="set"><div class="set-text" id="lbl-auto"><b>Auto mode</b><small>Starts when an agent works, ends when they go quiet</small></div>
     <button class="switch" role="switch" id="sw-auto" aria-labelledby="lbl-auto" aria-checked="false"></button></div>
-  <div class="set"><div class="set-text" id="lbl-lid"><b>Closed-lid mode</b><small>Keep running with the lid shut</small></div>
-    <button class="switch" role="switch" id="sw-lid" aria-labelledby="lbl-lid" aria-checked="false"></button></div>
-  <div class="set"><div class="set-text"><b>Appearance</b><small>Colour follows the agent that is working</small></div>
-    <div class="seg3" role="group" aria-label="Appearance" id="theme-seg">
-      <button data-theme="auto" aria-pressed="true">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div></div>
   <div class="set" style="align-items:flex-start;flex-direction:column;gap:8px;padding:8px 0 4px">
     <div class="set-text"><b>Push alerts</b><small>Get approvals and "finished" alerts as notifications, even when this page is closed. Needs the free ntfy app.</small></div>
     <button class="btn btn-accent" style="width:100%" id="push-btn">Turn on notifications</button>
     <p class="hint" id="push-hint"></p>
-    <details style="width:100%;font-size:14px;color:var(--muted)"><summary style="min-height:44px;display:flex;align-items:center;cursor:pointer">Prefer the ntfy app instead?</summary>
-      <p style="margin:4px 0 8px"><a id="ntfy-store" href="#" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Install ntfy</a>, tap <b>+</b>, and paste this channel:</p>
-      <div style="display:flex;gap:8px;width:100%">
-        <code id="topic-code" style="flex:1;min-width:0;font:500 13px var(--mono);background:var(--surface-2);border-radius:var(--r-sm);padding:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
-        <button class="btn btn-quiet" style="min-height:44px" id="copy-topic">Copy</button>
-      </div></details>
   </div>
   <div class="set" id="install-row" hidden><div class="set-text"><b>Add to Home Screen</b><small>Opens full-screen like an app</small></div>
     <button class="btn btn-quiet" style="min-height:44px" id="install-btn">Install</button></div>
@@ -224,15 +205,6 @@ textarea{width:100%;min-height:120px;border:0;border-radius:var(--r-md);backgrou
   <button class="link-btn" id="unpair">Unpair this phone</button>
 </dialog>
 
-<dialog id="compose" aria-labelledby="compose-title">
-  <div class="grab" aria-hidden="true"></div>
-  <h2 class="sheet-title" id="compose-title">Message</h2>
-  <p class="sheet-sub" id="compose-sub"></p>
-  <label class="sr" for="compose-text">Message to send</label>
-  <textarea id="compose-text" placeholder="Type what you'd say in the terminal" autocapitalize="sentences" enterkeyhint="send"></textarea>
-  <div class="quick" id="quick"></div>
-  <button class="btn btn-accent" style="width:100%" id="compose-send">Send</button>
-</dialog>
 
 <script>
 "use strict";
@@ -260,13 +232,12 @@ const store = { get: (k) => { try { return localStorage.getItem(k) } catch { ret
 
 // ---- state ----
 let topic = "";
-const S = { status: null, seenAt: 0, conn: "connecting", asks: new Map(), replied: new Set(), plan: 120, pick: null, target: "sessions",
-            waiting: null, pingAt: 0, pendingSay: new Map(), theme: store.get("nl.theme") || "auto", installEvt: null };
+const S = { status: null, seenAt: 0, conn: "connecting", asks: new Map(), replied: new Set(), plan: 120, pick: null, waiting: null, pingAt: 0, installEvt: null };
 
 // ---- theme ----
 function applyTheme() {
   const root = document.documentElement;
-  const dark = S.theme === "dark" || (S.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme = dark ? "dark" : "light";
   const st = S.status, list = st?.sessions || [];
   const lead = list.find(x => x.p && x.b) || list.find(x => x.b) || list.find(x => x.p);
@@ -291,7 +262,7 @@ let es;
 function connect() {
   es && es.close();
   S.conn = "connecting"; render();
-  es = new EventSource(`${NTFY}/${topic}-status,${topic}-ask,${topic}-reply,${topic}-ack/sse?since=10m`);
+  es = new EventSource(`${NTFY}/${topic}-status,${topic}-ask,${topic}-reply/sse?since=10m`);
   es.onopen = () => { S.conn = "live"; ping(true); render(); if (!S.said) { S.said = 1; diag("open") } };
   es.onerror = () => { S.conn = "connecting"; render() };
   es.onmessage = (e) => {
@@ -307,9 +278,6 @@ function connect() {
         if (!S.replied.has(a.rid) && a.until * 1000 > Date.now()) { S.asks.set(a.rid, a); if (S.conn === "live") vibrate([30, 60, 30]) }
       } else if (kind === "reply") {
         const [, rid] = (m.message || "").split(" "); if (rid) { S.replied.add(rid); S.asks.delete(rid) }
-      } else if (kind === "ack") {
-        const a = JSON.parse(m.message), p = S.pendingSay.get(a.id);
-        if (p) { clearTimeout(p.t); S.pendingSay.delete(a.id); toast(a.ok ? `Sent to ${p.title}` : "Couldn't type into that session. Is its Terminal tab still open?") }
       }
     } catch { return }
     render();
@@ -331,12 +299,6 @@ async function answer(rid, allow) {
   try { await post(`${topic}-reply`, `${allow ? "allow" : "deny"} ${rid}`); S.replied.add(rid); S.asks.delete(rid); toast(allow ? "Approved" : "Denied") }
   catch (e) { card && card.classList.remove("out"); toast(e.message) }
   setTimeout(render, 200);
-}
-async function say(pid, title, text) {
-  const id = Math.random().toString(36).slice(2, 10);
-  try { await post(`${topic}-cmd`, { cmd: "say", id, pid, text }) } catch (e) { toast(e.message); return }
-  S.pendingSay.set(id, { title, t: setTimeout(() => { S.pendingSay.delete(id); toast("No reply from your Mac yet") }, 15000) });
-  toast("Sending…"); vibrate(15);
 }
 
 // ---- formatting ----
@@ -390,7 +352,7 @@ function render() {
 
   if (!st) {
     h += `<div class="list"><div class="empty"><strong>${S.conn === "live" ? "Waiting for your Mac" : "Connecting"}</strong>
-      Open Nightlight on your Mac and turn on Phone alerts. Status appears here within a few seconds.</div></div>`;
+      Open Nightlight on your Mac and turn on Phone. Status appears here within a few seconds.</div></div>`;
     app.innerHTML = h; dock.hidden = true; bindMain(); return;
   }
 
@@ -408,6 +370,7 @@ function render() {
     </div></section>`;
 
   const sessions = st.sessions || [], picking = !st.active, pick = S.pick || new Set();
+  const auto = st.auto && picking;
   h += `<section aria-labelledby="sess-h"><h2 class="section-title" id="sess-h">${picking ? "Keep alive" : "Sessions"}<span>${sessions.filter(x => x.b).length} working</span></h2><div class="list">`;
   if (!sessions.length) h += `<div class="empty"><strong>No agents running</strong>Start Claude, Codex or another agent on your Mac.</div>`;
   h += sessions.map(x => {
@@ -416,12 +379,9 @@ function render() {
     const main = `<span class="row-text"><span class="row-title">${esc(x.t)}</span>
         <span class="row-meta">${esc(x.a)} · ${esc(x.k === "Desktop" ? x.f : x.k)} · ${esc(x.act)}</span></span>`;
     if (picking) return `<button class="row" data-pid="${x.id}" aria-pressed="${on}" aria-label="${esc(x.t)}, ${esc(x.a)}, ${esc(x.act)}">${lead}${main}</button>`;
-    return `<div class="row" role="group" aria-label="${esc(x.t)}, ${esc(x.a)}, ${esc(x.act)}">${lead}${main}
-        ${x.r ? `<button class="reply" data-say="${x.id}" data-title="${esc(x.t)}" aria-label="Message ${esc(x.t)}">${svg("msg")}</button>` : ""}</div>`;
+    return `<div class="row" role="group" aria-label="${esc(x.t)}, ${esc(x.a)}, ${esc(x.act)}">${lead}${main}</div>`;
   }).join("");
-  if (picking) h += `<button class="row" data-mac aria-pressed="${S.target === "mac"}"><span class="check" aria-hidden="true">${svg("check")}</span>
-      <span class="row-text"><span class="row-title">Whole Mac</span><span class="row-meta">Every app keeps running</span></span></button>`;
-  h += `</div><p class="hint">Updated ${ago(S.seenAt)}${!picking && sessions.some(x => x.r) ? " · Tap the bubble to type into a Terminal session" : ""}${st.helper ? "" : " · Closed-lid mode from here needs password-free mode on the Mac"}</p></section>`;
+  h += `</div><p class="hint">Updated ${ago(S.seenAt)}${auto ? " · Auto is on: a run starts by itself when an agent works" : ""}${st.helper ? "" : " · Finish setup on the Mac so closed-lid mode works from here"}</p></section>`;
   app.innerHTML = h;
 
   const w = S.waiting; let d = "";
@@ -430,11 +390,10 @@ function render() {
       ${st.endsAt ? `<button class="btn btn-quiet" id="add15" ${w ? "disabled" : ""}>${svg("plus")}15 min</button>` : ""}
       <button class="btn btn-primary" id="stop" ${w ? "disabled" : ""}>${svg("stop")}${w === "stop" ? "Ending…" : "End run"}</button></div>`;
   } else {
-    const n = S.target === "mac" ? 0 : pick.size;
-    const label = S.target === "mac" ? "Keep Mac awake" : n === 1 ? "Keep 1 session running" : `Keep ${n} sessions running`;
-    d = `<div class="seg" role="group" aria-label="Duration">${[60, 120, 240, 480, 0].map(m =>
+    const n = pick.size, label = n === 1 ? "Keep 1 session running" : `Keep ${n} sessions running`;
+    d = `<div class="seg" role="group" aria-label="Duration">${[60, 120, 240, 0].map(m =>
       `<button data-plan="${m}" aria-pressed="${S.plan === m}" aria-label="${m ? fmtPlan(m) : "No time limit"}">${m ? fmtPlan(m) : "∞"}</button>`).join("")}</div>
-      <button class="btn btn-accent" id="start" ${w || (S.target !== "mac" && !n) ? "disabled" : ""}>${svg("bolt")}${w === "start" ? "Starting…" : label}</button>`;
+      <button class="btn btn-accent" id="start" ${w || !n ? "disabled" : ""}>${svg("bolt")}${w === "start" ? "Starting…" : label}</button>`;
   }
   $("dock-in").innerHTML = d; dock.hidden = false;
   bindMain();
@@ -445,13 +404,11 @@ function bindMain() {
   document.querySelectorAll("[data-allow]").forEach(b => b.onclick = () => answer(b.dataset.allow, true));
   document.querySelectorAll("[data-deny]").forEach(b => b.onclick = () => answer(b.dataset.deny, false));
   document.querySelectorAll("[data-pid]").forEach(b => b.onclick = () => {
-    const id = +b.dataset.pid; S.pick = S.pick || new Set(); S.target = "sessions";
+    const id = +b.dataset.pid; S.pick = S.pick || new Set();
     S.pick.has(id) ? S.pick.delete(id) : S.pick.add(id); vibrate(8); render();
   });
-  document.querySelectorAll("[data-say]").forEach(b => b.onclick = () => openCompose(+b.dataset.say, b.dataset.title));
-  const mac = document.querySelector("[data-mac]"); mac && (mac.onclick = () => { S.target = S.target === "mac" ? "sessions" : "mac"; vibrate(8); render() });
   document.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => { S.plan = +b.dataset.plan; vibrate(8); render() });
-  $("start") && ($("start").onclick = () => send({ cmd: "start", target: S.target, pids: [...(S.pick || [])], minutes: S.plan }, "start"));
+  $("start") && ($("start").onclick = () => send({ cmd: "start", pids: [...(S.pick || [])], minutes: S.plan }, "start"));
   $("stop") && ($("stop").onclick = () => send({ cmd: "stop" }, "stop"));
   $("add15") && ($("add15").onclick = () => send({ cmd: "add", minutes: 15 }, "add"));
 }
@@ -460,7 +417,7 @@ function pairView() {
   return `<section class="pair"><img src="icon-192.png" alt="">
     <div><h1>Your agents, from your pocket</h1><p style="margin-top:8px">Approve, reply and end runs while your Mac works with the lid shut.</p></div>
     <ol class="steps"><li class="step"><span>On your Mac, open <b>Nightlight</b>, then <b>Settings</b>.</span></li>
-    <li class="step"><span>Turn on <b>Phone alerts</b> and scan the code with your camera.</span></li></ol>
+    <li class="step"><span>Turn on <b>Phone</b> and scan the code with your camera.</span></li></ol>
     <div class="field"><label for="code">Or paste your pairing code</label>
       <input id="code" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="claude-awake-3f9c…">
       <span class="hint">It stays on this phone. Anyone with the code can control your Mac's keep-awake, so keep it private.</span></div>
@@ -478,27 +435,21 @@ function bindPair() {
 function openSheet() {
   const st = S.status || {};
   $("sw-auto").setAttribute("aria-checked", !!st.auto);
-  $("sw-lid").setAttribute("aria-checked", !!st.lidMode);
   const ios = /iPhone|iPad/.test(navigator.userAgent);
-  $("ntfy-store").href = ios ? "https://apps.apple.com/app/ntfy/id1625396347" : "https://play.google.com/store/apps/details?id=io.heckel.ntfy";
-  $("topic-code").textContent = topic;
   refreshPushUI();
-  document.querySelectorAll("#theme-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.theme === S.theme));
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   $("install-row").hidden = !S.installEvt || standalone;
   $("install-hint").hidden = standalone || !!S.installEvt || !/iPhone|iPad/.test(navigator.userAgent);
   $("sheet").showModal();
 }
 $("sw-auto").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", auto: v }, "set") };
-$("sw-lid").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", lidMode: v }, "set") };
-document.querySelectorAll("#theme-seg button").forEach(b => b.onclick = () => { S.theme = b.dataset.theme; store.set("nl.theme", S.theme === "auto" ? null : S.theme); openSheet(); render() });
 // ---- real push notifications (Web Push, sent by the Mac) ----
 const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 function refreshPushUI() {
   const btn = $("push-btn"), hint = $("push-hint"), ios = /iPhone|iPad/.test(navigator.userAgent);
   const supported = "PushManager" in window && "serviceWorker" in navigator && "Notification" in window;
   if (!supported && ios && !standalone()) { btn.hidden = true; hint.hidden = false; hint.textContent = "On iPhone, first add Nightlight to your Home Screen (Share, then Add to Home Screen), open it from there, and turn on notifications."; return }
-  if (!supported) { btn.hidden = true; hint.hidden = false; hint.textContent = "This browser can't receive push notifications. Use the ntfy app below."; return }
+  if (!supported) { btn.hidden = true; hint.hidden = false; hint.textContent = "This browser can't receive push notifications. Try Chrome or Safari."; return }
   const on = store.get("nl.push") === "1" && Notification.permission === "granted";
   btn.hidden = false; btn.textContent = on ? "Notifications are on" : "Turn on notifications"; btn.disabled = on;
   hint.hidden = false; hint.textContent = on ? "Approvals and alerts arrive even when this page is closed." :
@@ -521,30 +472,11 @@ function diag(kind, extra) {
   post(`${topic}-cmd`, { cmd: "diag", kind, extra: extra || "", standalone: standalone(), push: "PushManager" in window,
     perm: ("Notification" in window) ? Notification.permission : "n/a", ua: navigator.userAgent.slice(0, 90) }).catch(() => {});
 }
-$("copy-topic").onclick = async () => { try { await navigator.clipboard.writeText(topic); toast("Channel copied. Paste it in ntfy.") } catch { toast("Long-press the code to copy it") } };
 $("install-btn").onclick = async () => { if (S.installEvt) { S.installEvt.prompt(); await S.installEvt.userChoice; S.installEvt = null; $("install-row").hidden = true } };
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); S.installEvt = e });
-for (const id of ["sheet", "compose"]) $(id).addEventListener("click", (e) => { if (e.target === $(id)) $(id).close() });
+$("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) $("sheet").close() });
 $("unpair").onclick = () => { store.set("nl.topic", null); history.replaceState(null, "", location.pathname); topic = ""; es && es.close(); $("sheet").close(); render() };
 
-// ---- compose sheet ----
-let composeTo = null;
-const QUICK = ["Continue", "Yes, go ahead", "Looks good, commit it", "Stop and summarize what you did", "Run the tests"];
-function openCompose(pid, title) {
-  composeTo = { pid, title };
-  $("compose-sub").textContent = `Typed into "${title}" and sent with Return.`;
-  $("compose-text").value = "";
-  $("quick").innerHTML = QUICK.map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("");
-  document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { $("compose-text").value = b.dataset.q; $("compose-text").focus() });
-  $("compose").showModal();
-  setTimeout(() => $("compose-text").focus(), 50);
-}
-$("compose-send").onclick = () => {
-  const text = $("compose-text").value.trim();
-  if (!text || !composeTo) return;
-  $("compose").close(); say(composeTo.pid, composeTo.title, text);
-};
-$("compose-text").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("compose-send").click() } });
 
 let tt;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2800) }

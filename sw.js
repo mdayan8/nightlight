@@ -1,5 +1,5 @@
 // Nightlight service worker: app shell cache + real push notifications sent by the Mac.
-const CACHE = "nightlight-v3";
+const CACHE = "nightlight-v4";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./logo.svg"];
 
 self.addEventListener("install", (e) => {
