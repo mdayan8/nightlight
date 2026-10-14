@@ -209,15 +209,14 @@ textarea{width:100%;min-height:120px;border:0;border-radius:var(--r-md);backgrou
       <button data-theme="auto" aria-pressed="true">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div></div>
   <div class="set" style="align-items:flex-start;flex-direction:column;gap:8px;padding:8px 0 4px">
     <div class="set-text"><b>Push alerts</b><small>Get approvals and "finished" alerts as notifications, even when this page is closed. Needs the free ntfy app.</small></div>
-    <ol class="steps" style="gap:12px;margin-top:4px;font-size:14px">
-      <li class="step" style="font-size:14px"><span><a id="ntfy-store" href="#" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Install ntfy</a>, free, no account.</span></li>
-      <li class="step" style="font-size:14px"><span>In ntfy tap <b>+</b> and paste your channel:</span></li>
-    </ol>
-    <div style="display:flex;gap:8px;width:100%">
-      <code id="topic-code" style="flex:1;min-width:0;font:500 13px var(--mono);background:var(--surface-2);border-radius:var(--r-sm);padding:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
-      <button class="btn btn-quiet" style="min-height:44px" id="copy-topic">Copy</button>
-    </div>
-    <a class="btn btn-quiet" style="min-height:44px;text-decoration:none;width:100%" id="sub-link" target="_blank" rel="noopener">Open in ntfy</a>
+    <button class="btn btn-accent" style="width:100%" id="push-btn">Turn on notifications</button>
+    <p class="hint" id="push-hint"></p>
+    <details style="width:100%;font-size:14px;color:var(--muted)"><summary style="min-height:44px;display:flex;align-items:center;cursor:pointer">Prefer the ntfy app instead?</summary>
+      <p style="margin:4px 0 8px"><a id="ntfy-store" href="#" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Install ntfy</a>, tap <b>+</b>, and paste this channel:</p>
+      <div style="display:flex;gap:8px;width:100%">
+        <code id="topic-code" style="flex:1;min-width:0;font:500 13px var(--mono);background:var(--surface-2);border-radius:var(--r-sm);padding:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
+        <button class="btn btn-quiet" style="min-height:44px" id="copy-topic">Copy</button>
+      </div></details>
   </div>
   <div class="set" id="install-row" hidden><div class="set-text"><b>Add to Home Screen</b><small>Opens full-screen like an app</small></div>
     <button class="btn btn-quiet" style="min-height:44px" id="install-btn">Install</button></div>
@@ -483,7 +482,7 @@ function openSheet() {
   const ios = /iPhone|iPad/.test(navigator.userAgent);
   $("ntfy-store").href = ios ? "https://apps.apple.com/app/ntfy/id1625396347" : "https://play.google.com/store/apps/details?id=io.heckel.ntfy";
   $("topic-code").textContent = topic;
-  $("sub-link").href = ios ? `${NTFY}/${topic}` : `ntfy://ntfy.sh/${topic}`;
+  refreshPushUI();
   document.querySelectorAll("#theme-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.theme === S.theme));
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   $("install-row").hidden = !S.installEvt || standalone;
@@ -493,6 +492,30 @@ function openSheet() {
 $("sw-auto").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", auto: v }, "set") };
 $("sw-lid").onclick = (e) => { const v = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", v); send({ cmd: "set", lidMode: v }, "set") };
 document.querySelectorAll("#theme-seg button").forEach(b => b.onclick = () => { S.theme = b.dataset.theme; store.set("nl.theme", S.theme === "auto" ? null : S.theme); openSheet(); render() });
+// ---- real push notifications (Web Push, sent by the Mac) ----
+const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+function refreshPushUI() {
+  const btn = $("push-btn"), hint = $("push-hint"), ios = /iPhone|iPad/.test(navigator.userAgent);
+  const supported = "PushManager" in window && "serviceWorker" in navigator && "Notification" in window;
+  if (!supported && ios && !standalone()) { btn.hidden = true; hint.hidden = false; hint.textContent = "On iPhone, first add Nightlight to your Home Screen (Share, then Add to Home Screen), open it from there, and turn on notifications."; return }
+  if (!supported) { btn.hidden = true; hint.hidden = false; hint.textContent = "This browser can't receive push notifications. Use the ntfy app below."; return }
+  const on = store.get("nl.push") === "1" && Notification.permission === "granted";
+  btn.hidden = false; btn.textContent = on ? "Notifications are on" : "Turn on notifications"; btn.disabled = on;
+  hint.hidden = false; hint.textContent = on ? "Approvals and alerts arrive even when this page is closed." :
+    S.status?.vapid ? "Your Mac sends them directly. No account, no app." : "Waiting for your Mac to connect…";
+}
+$("push-btn").onclick = async () => {
+  try {
+    if (!S.status?.vapid) { toast("Open Nightlight on your Mac first"); return }
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { toast("Notifications were not allowed"); return }
+    const reg = await navigator.serviceWorker.ready;
+    const key = Uint8Array.from(atob(S.status.vapid.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+    await post(`${topic}-cmd`, { cmd: "push", sub: sub.toJSON() });
+    store.set("nl.push", "1"); toast("Done. A test notification is on its way."); refreshPushUI();
+  } catch (e) { toast("Couldn't turn on notifications: " + (e.message || e)) }
+};
 $("copy-topic").onclick = async () => { try { await navigator.clipboard.writeText(topic); toast("Channel copied. Paste it in ntfy.") } catch { toast("Long-press the code to copy it") } };
 $("install-btn").onclick = async () => { if (S.installEvt) { S.installEvt.prompt(); await S.installEvt.userChoice; S.installEvt = null; $("install-row").hidden = true } };
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); S.installEvt = e });
