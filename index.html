@@ -292,7 +292,7 @@ function connect() {
   es && es.close();
   S.conn = "connecting"; render();
   es = new EventSource(`${NTFY}/${topic}-status,${topic}-ask,${topic}-reply,${topic}-ack/sse?since=10m`);
-  es.onopen = () => { S.conn = "live"; ping(true); render() };
+  es.onopen = () => { S.conn = "live"; ping(true); render(); if (!S.said) { S.said = 1; diag("open") } };
   es.onerror = () => { S.conn = "connecting"; render() };
   es.onmessage = (e) => {
     let m; try { m = JSON.parse(e.data) } catch { return }
@@ -514,8 +514,13 @@ $("push-btn").onclick = async () => {
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
     await post(`${topic}-cmd`, { cmd: "push", sub: sub.toJSON() });
     store.set("nl.push", "1"); toast("Done. A test notification is on its way."); refreshPushUI();
-  } catch (e) { toast("Couldn't turn on notifications: " + (e.message || e)) }
+  } catch (e) { toast("Couldn't turn on notifications: " + (e.message || e)); diag("push-error", String(e && (e.message || e))) }
 };
+// One-line diagnostic to the relay so setup problems can be seen from the Mac side. No personal data.
+function diag(kind, extra) {
+  post(`${topic}-cmd`, { cmd: "diag", kind, extra: extra || "", standalone: standalone(), push: "PushManager" in window,
+    perm: ("Notification" in window) ? Notification.permission : "n/a", ua: navigator.userAgent.slice(0, 90) }).catch(() => {});
+}
 $("copy-topic").onclick = async () => { try { await navigator.clipboard.writeText(topic); toast("Channel copied. Paste it in ntfy.") } catch { toast("Long-press the code to copy it") } };
 $("install-btn").onclick = async () => { if (S.installEvt) { S.installEvt.prompt(); await S.installEvt.userChoice; S.installEvt = null; $("install-row").hidden = true } };
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); S.installEvt = e });
